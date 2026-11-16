@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>测一测，你是《后会友期》里的谁</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+body{background:#fff8fa;color:#333;line-height:1.6;padding:16px;max-width:720px;margin:0 auto;}
+.card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 4px 16px rgba(230,180,200,0.15);margin-bottom:20px;}
+.title{font-size:24px;font-weight:bold;color:#c96887;text-align:center;margin-bottom:8px;}
+.subtitle{text-align:center;color:#886;margin-bottom:20px;}
+.tag-wrap{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+.tag{background:#ffe6ee;color:#b85878;padding:6px 10px;border-radius:99px;font-size:13px;}
+.btn-start{display:block;width:100%;border:none;background:#d87898;color:#fff;padding:14px;border-radius:14px;font-size:17px;font-weight:500;cursor:pointer;}
+.tip-small{font-size:12px;color:#999;text-align:center;margin-top:12px;}
+.question{display:none;}
+.question h3{margin-bottom:14px;font-size:16px;}
+.opt{display:block;width:100%;text-align:left;border:1px solid #f0d6e0;background:#fff;padding:12px 14px;border-radius:12px;margin:8px 0;cursor:pointer;transition:0.2s;}
+.opt:hover{background:#ffeef4;border-color:#e2a8bf;}
+.opt.active{background:#f8d8e4;border-color:#d87898;}
+.nav-row{display:flex;gap:10px;margin-top:16px;}
+.nav-btn{flex:1;padding:12px;border-radius:12px;border:none;background:#f3e1e8;color:#777;cursor:pointer;}
+.nav-btn.next{background:#d87898;color:#fff;}
+.result{display:none;}
+.res-title{font-size:22px;color:#c96887;font-weight:bold;text-align:center;margin-bottom:12px;}
+.res-desc{line-height:1.7;color:#444;}
+.hash-tag{margin-top:20px;color:#b85878;font-size:14px;line-height:1.8;}
+</style>
+</head>
+<body>
+<div id="page-home" class="card">
+  <div class="title">测一测，你是《后会友期》里的谁</div>
+  <div class="subtitle">你的友情模式，对应节目里哪一位</div>
+  <div class="tag-wrap">
+    <span class="tag">✅友情模式｜看懂你交朋友的底层习惯</span>
+    <span class="tag">✅冲突反应｜吵架后你会怎么对待朋友</span>
+    <span class="tag">✅边界偏好｜你需要亲密还是距离</span>
+    <span class="tag">✅性格解读｜找到同频的友情搭子</span>
+  </div>
+  <button class="btn-start" onclick="startTest()">点击测试 →</button>
+  <div class="tip-small">趣味测试仅供娱乐，不代表真实人际关系</div>
+</div>
+
+<div id="page-question" class="question card">
+  <h3 id="q-text"></h3>
+  <div id="opt-wrap"></div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="prevQ()">上一题</button>
+    <button class="nav-btn next" onclick="nextQ()">下一题</button>
+  </div>
+  <div class="tip-small" id="q-index"></div>
+</div>
+
+<div id="page-result" class="result card">
+  <div class="res-title" id="res-name"></div>
+  <div class="res-desc" id="res-text"></div>
+  <div class="hash-tag">#后会友期 #性格测试 #趣味测试 #友情与勇气 #个人性格探索 #心理测试 #阶段性友谊才是常态 #友情与成长</div>
+  <button class="btn-start" style="margin-top:20px" onclick="restart()">重新测试</button>
+</div>
+
+<script>
+// A白小纯 B青雉 C王子璇 D文吉儿 E马天宇 F张萌
+const questions = [
+  {q:"和好友产生小矛盾，当下你的第一反应是？",o:["A 沉默不辩解，自己悄悄消化情绪","B 直接开口说问题，快速想办法解决","C 冷静理清对错，不纠结无谓争执","D 心里积攒委屈，期待对方主动察觉","E 默默淡化矛盾，不想过多纠缠拉扯","F 忍不住主动沟通，迫切和好挽回"]},
+  {q:"朋友很久不主动找你，你会？",o:["A 不会主动打扰，默默放在心里惦记","B 觉得无所谓，各自有自己的生活节奏","C 坦然接受疏离，不勉强任何关系","D 反复回想过往相处，内心敏感失落","E 顺其自然，不追问、不刻意维系","F 主动发消息分享日常，拉近关系"]},
+  {q:"被信任的朋友随口否定你的想法，你会？",o:["A 瞬间难过但不反驳，悄悄拉开距离","B 直接说出自己的想法，据理力争","C 认清彼此观念不合，慢慢疏远","D 积攒失落，期待对方道歉解释","E 一笑而过，不放在心上、不内耗","F 有点冲动委屈，忍不住较真辩解"]},
+  {q:"和朋友吵架冷战，你通常的状态是？",o:["A 嘴硬不说软话，心里一直等着和解","B 想赶紧把问题解决，结束冷战状态","C 冷静复盘对错，不合适就体面放下","D 反复回忆细节，越想越觉得委屈","E 保持松弛状态，不主动也不内耗","F 心里格外煎熬，很怕彻底失去对方"]},
+  {q:"朋友做事忽略你的情绪，只讲结果，你会？",o:["A 默默包容退让，不会直白说不满","B 理解对方初衷，专注解决当下问题","C 清楚彼此适配度低，减少深度相处","D 心里耿耿于怀，期待对方懂得共情","E 悄悄抽离相处，降低对对方的期待","F 直接说出情绪，希望对方重视自己"]},
+  {q:"面对一段疲惫的友情，你的选择是？",o:["A 舍不得放下，默默坚守不愿离开","B 主动沟通调整，想办法改善关系","C 及时止损，体面结束内耗的关系","D 不甘心结束，想要一个完整交代","E 慢慢淡出，不纠缠不纠结不勉强","F 拼命付出挽回，舍不得这份情谊"]},
+  {q:"和朋友相处，你最在意什么？",o:["A 彼此的默契和细节里的真心","B 相处的舒服高效、不拖泥带水","C 关系的平等、尊重和边界感","D 专属偏爱、真诚对待和仪式感","E 相处的松弛感、无束缚无捆绑","F 彼此坦诚亲近、事事有回应"]},
+  {q:"误会发生后，你会主动解释自己吗？",o:["A 很少主动，觉得懂自己的人不用讲","B 立刻解释清楚，杜绝多余矛盾","C 懒得过多解释，懂与不懂随缘就好","D 会等待时机，希望双向沟通澄清","E 基本不解释，任由时间淡化误会","F 主动全盘解释，不想留下隔阂"]},
+  {q:"朋友拒绝了你的善意分享或帮助，你会？",o:["A 默默收回心意，心里悄悄失落","B 理解对方选择，继续专注做事","C 坦然接受，明白彼此需求不同","D 有点难过，觉得真心没被珍惜","E 毫不在意，保持原本相处节奏","F 瞬间失落冲动，忍不住有点难过"]},
+  {q:"团队相处出现分歧，你会？",o:["A 不站队不争论，默默保留自己想法","B 直言观点差异，主动推进统一答案","C 理性分析利弊，选择最优方案","D 在意大家态度，害怕自己被忽视","E 保持中立旁观，不参与纷争拉扯","F 主动调和气氛，希望大家和睦"]},
+  {q:"你对待旧友情的态度是？",o:["A 铭记所有细节，心底一直留有位置","B 过往翻篇，专注当下新的相处","C 体面告别，不回头不纠结过往","D 念旧重情，遗憾没有圆满结局","E 释怀放下，不强求关系复原","F 念旧且执着，总想重拾旧日情谊"]},
+  {q:"朋友对你忽冷忽热，你会？",o:["A 自我内耗猜测，但绝不主动询问","B 直接问清原因，解决相处问题","C 看清状态，及时抽离不再投入","D 委屈积攒增多，期待对方稳定态度","E 慢慢疏远，适应对方的相处节奏","F 主动靠近试探，想要稳定关系"]},
+  {q:"相处中感到被人情捆绑，你会？",o:["A 默默迁就妥协，不敢轻易拒绝","B 直接坦诚表态，划清相处边界","C 果断脱身，拒绝被动消耗","D 满心无奈，却不好意思主动推开","E 悄悄抽离关系，摆脱捆绑束缚","F 不愿迁就，直白表达自己的不适"]},
+  {q:"和直球强势的朋友相处，你的状态是？",o:["A 容易感到压力，习惯性后退避让","B 适配度很高，沟通直接不绕弯","C 可以相互制衡，相处清爽舒服","D 容易产生矛盾，觉得不被包容","E 节奏不合拍，偏爱松弛的相处","F 愿意包容迁就，适配对方节奏"]},
+  {q:"友情里受了委屈，你会怎么处理？",o:["A 独自消化藏心底，绝不主动倾诉","B 说出问题，快速解决不留隐患","C 冷静消化，之后慢慢远离对方","D 默默积攒，最后一次性说清所有","E 自我释怀，不把委屈挂在心上","F 立刻倾诉情绪，想要对方哄自己"]},
+  {q:"你更偏爱哪种朋友相处模式？",o:["A 温柔默契、无需多言的细腻陪伴","B 干脆直接、有事说事的高效相处","C 清醒平等、有边界感的舒服关系","D 真诚专一、事事上心的专属情谊","E 松弛自由、互不捆绑的轻松相处","F 热烈亲密、双向奔赴的家人式友情"]},
+  {q:"朋友不小心说错话伤到你，你会？",o:["A 表面装作没事，心里久久介怀","B 当场指出问题，让对方及时改正","C 记在心里，慢慢降低相处频率","D 委屈难过，期待对方主动道歉","E 一笑置之，不会放在心上纠结","F 直接表达难过，希望对方重视"]},
+  {q:"一段关系结束，你会主动追问原因吗？",o:["A 不会追问，独自默默遗憾释怀","B 会直接询问，想要明确的答案","C 无需追问，体面接受所有结局","D 执着想要说法，不甘心模糊结束","E 从不追问，顺其自然接受离别","F 主动追问挽回，不想轻易散场"]},
+  {q:"对待朋友的求助，你向来是？",o:["A 默默帮忙，从不主动邀功言说","B 行动力拉满，快速帮对方解决问题","C 量力而行，不勉强自己迁就他人","D 全心付出，希望对方记着这份真心","E 适度帮忙，保持合适的距离分寸","F 倾尽全力，把朋友的事当作大事"]},
+  {q:"和需要独处空间的朋友相处，你会？",o:["A 尊重对方边界，悄悄保持距离","B 不太适应，总想主动沟通互动","C 完美适配，懂得把握相处分寸","D 容易没有安全感，害怕被冷落","E 极度适配，享受互不打扰的松弛","F 难以适应，总想时刻亲近彼此"]},
+  {q:"吵架后对方沉默不说话，你会？",o:["A 跟着沉默，等着对方主动破冰","B 主动开口，打破僵局解决问题","C 冷静等待，顺其自然看关系走向","D 越发焦虑委屈，期待对方哄自己","E 坦然看淡，沉默也是一种相处","F 忍不住主动破冰，害怕彻底冷战"]},
+  {q:"你在友情里最大的短板是？",o:["A 太过嘴硬，不懂主动表达心意","B 太重结果，容易忽略他人情绪","C 太过清醒，离开时过于干脆利落","D 期待太高，容易给自己带来内耗","E 太过松弛，常常显得疏离冷淡","F 太重情义，容易冲动情绪化"]},
+  {q:"朋友忘记了你们的重要约定，你会？",o:["A 不责怪对方，自己悄悄失落难过","B 直言提醒，希望对方重视约定","C 坦然释怀，理解每个人都有疏忽","D 格外失落，觉得自己不被重视","E 淡淡释怀，不会纠结过往细节","F 很生气，直白表达自己的不满"]},
+  {q:"面对朋友的负面情绪，你会？",o:["A 安静陪伴倾听，默默包容对方","B 帮忙分析问题，给出解决办法","C 理性开导，不被对方情绪裹挟","D 共情力拉满，跟着对方一起难过","E 适度安慰，保持自己的情绪稳定","F 全力安慰，想尽办法哄对方开心"]},
+  {q:"你对待友情的底线是？",o:["A 不被信任、被人随意否定","B 遇事逃避、不愿直面问题","C 无端指责、关系内耗拉扯","D 敷衍冷淡、没有专属对待","E 道德捆绑、强行拉近关系","F 冷漠疏离、不愿双向付出"]},
+  {q:"和清醒冷淡的朋友相处，你的感受是？",o:["A 有点拘谨，习惯性保持距离","B 不太合拍，觉得太过生硬冷漠","C 相处舒服，彼此尊重互不打扰","D 很难同频，感受不到足够真心","E 完美适配，喜欢这种松弛节奏","F 难以适应，渴望更热烈的相处"]},
+  {q:"误会解开后，你的状态是？",o:["A 心结还在，很难彻底回到从前","B 翻篇归零，照常相处不存芥蒂","C 坦然释怀，关系回归平淡常态","D 慢慢放下，但仍会在意细节","E 彻底释怀，不影响后续相处","F 立刻和好，比之前更加亲近"]},
+  {q:"你会不会主动维系变淡的友情？",o:["A 不会主动，只会默默珍藏回忆","B 随缘相处，有事再联系即可","C 坦然接受变淡，不刻意维系","D 想要维系，却不知道如何开口","E 从不刻意，顺其自然就好","F 拼命主动维系，不想关系走散"]},
+  {q:"朋友过度依赖你，你会？",o:["A 默默包容，不忍心推开对方","B 直言沟通，希望对方独立成长","C 适当疏远，保持舒适边界","D 满心在意，享受被需要的感觉","E 感到束缚，悄悄拉开相处距离","F 乐于照顾，把对方当作家人对待"]},
+  {q:"相处中你最怕出现哪种情况？",o:["A 真心被辜负、被信任的人误解","B 问题不解决、相处拖泥带水","C 关系无休止内耗、互相消耗","D 没有专属偏爱、对待太敷衍","E 被人情裹挟、失去相处自由","F 付出无回应、真心无人珍惜"]},
+  {q:"和重情绪敏感的朋友相处，你会？",o:["A 小心翼翼相处，尽量照顾对方","B 容易磕碰，常常忽略对方情绪","C 懂得包容，理性安抚对方情绪","D 高度合拍，能精准共情对方","E 节奏不符，难以适配敏感模式","F 十分适配，愿意主动迁就包容"]},
+  {q:"一段友情走到尾声，你最后的选择是？",o:["A 沉默退场，独自消化所有遗憾","B 解决最后问题，体面结束关系","C 果断抽身，干净利落互不纠缠","D 想要圆满收尾，索要一个交代","E 淡然离开，释怀所有过往过往","F 奋力挽回，拼尽全力留住情谊"]}
+];
+
+const resultMap = {
+  A:{name:"白小纯｜嘴硬心软的温柔藏藏派",txt:"你是典型的外冷内热型朋友，习惯性把情绪和软肋都藏在心底。你从不主动争抢偏爱，也不爱为自己辩解分毫，相处里永远默默记着所有细碎细节，把真心藏在沉默里。遇事习惯后退守住自己的边界，最怕被信任的人否定和误解，嘴上总是云淡风轻说着“算了”，可心事会悄悄搁在心里很久很久。你从不会主动激化矛盾，习惯用沉默回避争吵，看似疏离冷淡，实则最重情义。温柔又细腻的你，很适合主动真诚、懂得读懂你的人，却容易和直白激进、只顾解决问题的人产生摩擦。"},
+  B:{name:"青雉｜直球利落的行动实干派",txt:"你是友情里的靠谱行动派，从来不用甜言蜜语维系关系，只靠实际行动表达自己的在意。相处干脆坦荡，有矛盾会直接说开，认错干脆、不矫情不内耗，遇事永远优先解决问题，靠谱又有担当。但你的短板在于共情偏弱，总是执着于处理事情本身，常常忽略朋友当下的情绪感受，一片好心偶尔会变成无形的施压。你适配同样干脆利落、不纠结小情绪的朋友，和心思细腻、需要独处空间、偏爱情绪陪伴的人很容易产生磕碰，是典型的“做事满分、共情待提升”的真诚好友。"},
+  C:{name:"王子璇｜清醒通透的体面止损者",txt:"你拥有超正的友情三观，清醒理智、拎得清分寸。相处中你恩怨分明，冲突过后会冷静复盘所有问题，属于自己的责任坦然承担，绝不推卸，却绝不接受无端的指责和消耗。你最擅长及时止损，面对疲惫、内耗、不合频的友情，能够体面抽身、果断结束，不纠缠、不拉扯。唯一的小特点是离开得太过干脆，很少主动解释缘由，常常让人误以为你冷漠无情。你极度适配懂分寸、守边界、松弛淡然的朋友，很难和执着较真、需要明确交代、纠结过往细节的人同频。"},
+  D:{name:"文吉儿｜细腻较真的执念温柔家",txt:"你对友情有着极致的期待和纯粹的执念，真心百分百投入，格外看重专属感和仪式感。你记性极好，牢牢记住和朋友相处的所有细碎过往，把每一段情谊都郑重对待。性格细腻敏感，所有的委屈和不满不会当场爆发，只会一点点积攒，最后集中摊开，执着于想要一个明确的答复和圆满的交代。重情重义的你，共情力拉满，但过高的期待容易给自己和对方带来压力。你和同样重情绪、热烈真诚的人高度契合，完全无法适配只想快速了结矛盾、不愿纠缠过往的清醒型朋友。"},
+  E:{name:"马天宇｜松弛佛系的分寸感达人",txt:"你是友情里的淡系治愈选手，自带松弛滤镜，通透又豁达。相处中从不随意站队评判他人，反感人情捆绑和道德绑架，不喜欢亲密关系带来的束缚感。你看得开、放得下，过往的心结可以彻底释怀，破碎的关系不会强行复原，一切顺其自然。一旦感受到相处被裹挟、关系有压力，就会悄悄抽离、降低期待，很少提前说明自己的想法。你极致适配守边界、懂距离、清醒独立的朋友，和热烈黏人、渴求紧密联结、需要高频回应的人节奏完全相悖。"},
+  F:{name:"张萌｜热烈赤诚的重情守护者",txt:"你是友情里最温暖炙热的存在，天生重情重义，会把真心好友当成家人对待。待人坦荡仗义，愿意主动付出、分享自己的资源和温柔，毫无保留对待身边人。你格外渴求双向回应，满心真诚都希望能被对方看见、珍惜。性格直白热烈，喜怒哀乐都写在脸上，唯独软肋是情绪容易冲动，当自己的付出被拒绝、真心被忽视时，会瞬间失落上头，忍不住说出狠话、做出冲动举动。你足够温暖包容，能够慢慢融化嘴硬心软的内敛朋友，却很难适配偏爱松弛距离、不喜亲密捆绑的佛系型好友。"}
+};
+
+let current = 0;
+let score = {A:0,B:0,C:0,D:0,E:0,F:0};
+let ans = Array(questions.length).fill(null);
+
+function startTest(){
+  document.getElementById('page-home').style.display='none';
+  document.getElementById('page-question').style.display='block';
+  renderQ();
+}
+function renderQ(){
+  const q = questions[current];
+  document.getElementById('q-text').innerText = q.q;
+  document.getElementById('q-index').innerText = `第 ${current+1} / ${questions.length} 题`;
+  const wrap = document.getElementById('opt-wrap');
+  wrap.innerHTML = '';
+  q.o.forEach((it,idx)=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerText = it;
+    b.onclick = ()=>{
+      ans[current] = it[0];
+      document.querySelectorAll('.opt').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    }
+    if(ans[current]===it[0]) b.classList.add('active');
+    wrap.appendChild(b);
+  })
+}
+function nextQ(){
+  if(ans[current]==null){alert("请选择一项！");return;}
+  if(current < questions.length-1){
+    current++;renderQ();
+  }else{calcResult();}
+}
+function prevQ(){
+  if(current>0){current--;renderQ();}
+}
+function calcResult(){
+  score = {A:0,B:0,C:0,D:0,E:0,F:0};
+  ans.forEach(k=>score[k]++);
+  let maxk = 'A';
+  let maxv = 0;
+  for(let k in score){if(score[k]>maxv){maxv=score[k];maxk=k;}}
+  const r = resultMap[maxk];
+  document.getElementById('page-question').style.display='none';
+  document.getElementById('page-result').style.display='block';
+  document.getElementById('res-name').innerText = r.name;
+  document.getElementById('res-text').innerText = r.txt;
+}
+function restart(){
+  current=0;ans=Array(questions.length).fill(null);score={A:0,B:0,C:0,D:0,E:0,F:0};
+  document.getElementById('page-result').style.display='none';
+  document.getElementById('page-home').style.display='block';
+}
+</script>
+</body>
+</html>
